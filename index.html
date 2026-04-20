@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康知識大挑戰</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #game-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 { color: var(--primary-color); }
+
+        #question-text {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            min-height: 60px;
+        }
+
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .option-btn:hover {
+            border-color: var(--secondary-color);
+            background-color: #e3f2fd;
+        }
+
+        .correct {
+            background-color: #c8e6c9 !important;
+            border-color: #4CAF50 !important;
+        }
+
+        .wrong {
+            background-color: #ffcdd2 !important;
+            border-color: #f44336 !important;
+        }
+
+        #score-board {
+            margin-top: 20px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        #next-btn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+
+        #next-btn:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>🍎 健康小學堂</h1>
+    <div id="quiz-box">
+        <div id="question-text">載入題目中...</div>
+        <div id="options-container"></div>
+        <button id="next-btn" onclick="nextQuestion()">下一題</button>
+    </div>
+    <div id="score-board">得分: <span id="score">0</span></div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            q: "成人每天建議攝取多少毫升的水分（以 60kg 為例）？",
+            options: ["500ml", "1000ml", "約 1800-2400ml", "5000ml"],
+            correct: 2
+        },
+        {
+            q: "下列哪種運動屬於「有氧運動」？",
+            options: ["短跑衝刺", "重訓舉重", "慢跑", "仰臥起坐"],
+            correct: 2
+        },
+        {
+            q: "攝取過多的鈉（鹽分）最容易導致什麼問題？",
+            options: ["近視", "高血壓", "掉髮", "感冒"],
+            correct: 1
+        },
+        {
+            q: "人體最重要的消化器官，同時也是最大的代謝器官是？",
+            options: ["心臟", "肺部", "肝臟", "大腦"],
+            correct: 2
+        }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById('question-text');
+    const optionsEl = document.getElementById('options-container');
+    const scoreEl = document.getElementById('score');
+    const nextBtn = document.getElementById('next-btn');
+
+    function loadQuestion() {
+        nextBtn.style.display = 'none';
+        const currentData = quizData[currentIdx];
+        questionEl.innerText = `${currentIdx + 1}. ${currentData.q}`;
+        optionsEl.innerHTML = '';
+
+        currentData.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.classList.add('option-btn');
+            btn.onclick = () => checkAnswer(i, btn);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btn) {
+        const correctIdx = quizData[currentIdx].correct;
+        const allBtns = document.querySelectorAll('.option-btn');
+        
+        // 禁用所有按鈕防止重複點擊
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selected === correctIdx) {
+            btn.classList.add('correct');
+            score += 10;
+            scoreEl.innerText = score;
+        } else {
+            btn.classList.add('wrong');
+            allBtns[correctIdx].classList.add('correct');
+        }
+        
+        nextBtn.style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < quizData.length) {
+            loadQuestion();
+        } else {
+            questionEl.innerText = `恭喜完成！你的最終得分是：${score}`;
+            optionsEl.innerHTML = '';
+            nextBtn.innerText = "重新開始";
+            nextBtn.onclick = () => location.reload();
+            nextBtn.style.display = 'inline-block';
+        }
+    }
+
+    // 初始化
+    loadQuestion();
+</script>
+
+</body>
+</html>
